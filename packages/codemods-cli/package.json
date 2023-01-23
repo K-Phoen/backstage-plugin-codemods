@@ -35,7 +35,7 @@
   "devDependencies": {
     "@backstage/cli": "^0.22.1",
     "@types/commander": "^2.12.2",
-    "@types/fs-extra": "^9.0.6",
+    "@types/fs-extra": "^11.0.1",
     "@types/http-proxy": "^1.17.4",
     "@types/node": "^16.11.26",
     "@types/serve-handler": "^6.1.0",
@@ -63,7 +63,7 @@
     "@k-phoen/plugin-codemods-common": "0.0.0",
     "commander": "^9.1.0",
     "dockerode": "^3.3.1",
-    "fs-extra": "^10.0.1",
+    "fs-extra": "^11.1.0",
     "http-proxy": "^1.18.1",
     "winston": "^3.2.1",
     "yaml": "^2.0.0",
