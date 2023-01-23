@@ -1,0 +1,49 @@
+apiVersion: codemod.backstage.io/v1alpha1
+kind: Codemod
+metadata:
+  name: go-dependencies-update
+  title: Golang dependencies update
+  description: "Updates dependencies used in a Golang project."
+  tags: ["maintenance", "golang"]
+spec:
+  owner: user:guest
+
+  details: >
+    Updates a service's Go dependencies and submits the results in a GitHub Pull Request.
+
+    The update process equivalent to:
+      * `go get -u -t ./...`
+      * `go mod tidy`
+      * `go mod vendor`
+
+    This codemod is meant to be applied on backend services written in Go.
+
+  constraints:
+    kind: component
+    'spec.type': service
+
+  steps:
+    - id: test-debug
+      name: Print some debug
+      action: debug:log
+      input:
+        message: this is the message
+        listWorkspace: true
+
+    - id: test-print-entity-lifecycle
+      name: Print the entity lifecycle
+      action: debug:log
+      input:
+        message: "The lifecycle is: '${{ target.entity.spec.lifecycle }}'"
+
+    - id: test-print-entity
+      name: Print the entity
+      action: debug:log
+      input:
+        extra:
+          target: ${{ target.entity }}
+
+  output:
+    links:
+      - url: 'https://warf.voiapp.io'
+        text: Pull request

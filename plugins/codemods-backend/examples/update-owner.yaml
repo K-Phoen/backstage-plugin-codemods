@@ -1,0 +1,67 @@
+apiVersion: codemod.backstage.io/v1alpha1
+kind: Codemod
+metadata:
+  name: update-owner
+  title: Update service owner
+  description: "Updates the owner of backend services."
+  tags: ["maintenance"]
+spec:
+  owner: user:guest
+
+  details: >
+    Updates the owner of a given backend service.
+
+    This includes:
+      * the `.github/CODEOWNERS` file
+      * ownership metadata in Backstage
+      * monitoring & alerting configuration
+      * infrastructure ownership
+
+  constraints:
+    kind: [component]
+    'spec.type': service
+
+  parameters:
+    title: Configure the new owner
+    required: [owner]
+    properties:
+      owner:
+        title: New owner
+        type: string
+        description: New owner of the component
+
+  steps:
+    - id: clone-entity
+      name: Clone the repository
+      action: github:target:repo:clone
+      input:
+        destination: ./repo
+
+    - id: update-codeowners
+      name: Update the CODEOWNERS file
+      action: fs:write
+      input:
+        to: ./repo/.github/CODEOWNERS
+        content: >
+          * ${{ parameters.owner }}
+
+#    - id: push-branch
+#      name: Push the changes in a branch
+#      action: github:target:repo:push-branch
+#      input:
+#        repositoryPath: ./repo
+#        add:
+#          - .github/CODEOWNERS
+#        branchName: codemod-codeowner-change
+#        commitMessage: "😱 Set the owner to ${{ parameters.owner }}"
+
+    - id: open-pr-branch
+      name: Open a PR with the changes
+      action: github:target:repo:pull-request
+      input:
+        repositoryPath: ./repo
+        add:
+          - .github/CODEOWNERS
+        branchName: codemod-codeowner-change
+        title: "😱 Set the owner to ${{ parameters.owner }}"
+        description: "This change was made by a codemod in Backstage. Neat, right?"

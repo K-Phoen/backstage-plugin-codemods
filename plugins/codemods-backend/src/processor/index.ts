@@ -1,0 +1,1 @@
+export { CodemodEntitiesProcessor } from './CodemodEntitiesProcessor';
