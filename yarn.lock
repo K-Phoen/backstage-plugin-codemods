@@ -3155,7 +3155,7 @@ __metadata:
     "@material-ui/core": ^4.12.2
     "@material-ui/icons": ^4.9.1
     "@material-ui/lab": 4.0.0-alpha.57
-    "@react-hookz/web": ^20.0.0
+    "@react-hookz/web": ^22.0.0
     "@rjsf/core": ^3.2.1
     "@rjsf/material-ui": ^3.2.1
     "@testing-library/jest-dom": ^5.10.1
@@ -3908,6 +3908,22 @@ __metadata:
     js-cookie:
       optional: true
   checksum: bb393f892c2c81deff37d5f18faf8ec17431a24994d72d88ec390dcc1579b27318a7c8c6260070c87b66e8c635e4daec4436c33abf2622f842d1567235ed457d
+  languageName: node
+  linkType: hard
+
+"@react-hookz/web@npm:^22.0.0":
+  version: 22.0.0
+  resolution: "@react-hookz/web@npm:22.0.0"
+  dependencies:
+    "@react-hookz/deep-equal": ^1.0.4
+  peerDependencies:
+    js-cookie: ^3.0.1
+    react: ^16.8 || ^17 || ^18
+    react-dom: ^16.8 || ^17 || ^18
+  peerDependenciesMeta:
+    js-cookie:
+      optional: true
+  checksum: 2edda4b2f2e1525a9a6f59ce78110516ffffc5ad8c7381b6f4deff7b85e79dfb4d98e4eae9d4348210c3759b8eae3e4b18fd5f80afc362c91cea39964dfbb302
   languageName: node
   linkType: hard
 
