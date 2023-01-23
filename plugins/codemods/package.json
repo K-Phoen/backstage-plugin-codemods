@@ -50,7 +50,7 @@
     "@material-ui/icons": "^4.9.1",
     "@material-ui/lab": "4.0.0-alpha.57",
     "@react-hookz/web": "^20.0.0",
-    "@rjsf/core": "^3.2.1",
+    "@rjsf/core": "^4.2.3",
     "@rjsf/material-ui": "^3.2.1",
     "@types/json-schema": "^7.0.9",
     "classnames": "^2.2.6",
