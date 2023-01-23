@@ -3118,7 +3118,7 @@ __metadata:
     nunjucks: ^3.2.3
     p-queue: ^6.6.2
     supertest: ^6.2.4
-    uuid: ^8.2.0
+    uuid: ^9.0.0
     vm2: ^3.9.11
     winston: ^3.2.1
     zen-observable: ^0.10.0
@@ -20013,7 +20013,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"uuid@npm:^8.0.0, uuid@npm:^8.2.0, uuid@npm:^8.3.2":
+"uuid@npm:^8.0.0, uuid@npm:^8.3.2":
   version: 8.3.2
   resolution: "uuid@npm:8.3.2"
   bin:
