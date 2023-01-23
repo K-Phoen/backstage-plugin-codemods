@@ -1,0 +1,73 @@
+apiVersion: codemod.backstage.io/v1alpha1
+kind: Codemod
+metadata:
+  name: go-dependencies-update
+  title: Golang dependencies update
+  description: "Updates dependencies used in a Golang project."
+  tags: ["maintenance", "golang"]
+spec:
+  owner: user:guest
+
+  details: >
+    Updates a service's Go dependencies and submits the results in a GitHub Pull Request.
+
+    The update process equivalent to:
+      * `go get -u -t ./...`
+      * `go mod tidy`
+      * `go mod vendor`
+
+    This codemod is meant to be applied on backend services written in Go.
+
+  constraints:
+    kind: component
+    'spec.type': [service, library]
+
+  steps:
+    - id: cloneEntity
+      name: Clone the repository
+      action: github:target:repo:clone
+      input:
+        destination: ./repo
+
+    - id: updateDeps
+      name: Update Go dependencies
+      action: shell:exec
+      input:
+        directory: ./repo
+        command: go
+        args: [get, '-u', '-t', './...']
+
+    - id: goModTidy
+      name: Go mod tidy
+      action: shell:exec
+      input:
+        directory: ./repo
+        command: go
+        args: [mod, tidy]
+
+    - id: goModVendor
+      name: Go mod vendor
+      action: shell:exec
+      input:
+        directory: ./repo
+        command: go
+        args: [mod, vendor]
+
+    - id: openPr
+      name: Open a PR with the changes
+      action: github:target:repo:pull-request
+      input:
+        repositoryPath: ./repo
+        add:
+          - go.mod
+          - go.sum
+          - vendor
+        branchName: bump-dependencies-codemod-${{ job.timestamp }}
+        title: "Update dependencies"
+        description: "This change was made by a codemod in Backstage. Neat, right?"
+        labels: [dependencies, go, patch]
+
+  output:
+    links:
+      - url: ${{ steps.openPr.output.remoteUrl }}
+        text: Pull request

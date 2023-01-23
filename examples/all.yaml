@@ -1,0 +1,9 @@
+apiVersion: backstage.io/v1alpha1
+kind: Location
+metadata:
+  name: codemods-all
+  description: A collection of Codemods
+spec:
+  targets:
+    - ./go-dependencies-update.yaml
+    - ./update-owner.yaml
