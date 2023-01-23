@@ -61,7 +61,7 @@
     "luxon": "^3.0.0",
     "qs": "^6.9.4",
     "react-use": "^17.2.4",
-    "use-immer": "^0.7.0",
+    "use-immer": "^0.8.1",
     "zen-observable": "^0.10.0"
   },
   "peerDependencies": {
