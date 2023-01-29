@@ -149,13 +149,19 @@ export async function createRouter(
   );
 
   router.get('/v1/actions', async (_req, res) => {
-    const actionsList = actionRegistry.list().map(action => {
-      return {
-        id: action.id,
-        description: action.description,
-        schema: action.schema,
-      };
-    });
+    const actionsList = actionRegistry
+      .list()
+      .sort((a, b): number => {
+        return a.id.localeCompare(b.id);
+      })
+      .map(action => {
+        return {
+          id: action.id,
+          description: action.description,
+          examples: action.examples,
+          schema: action.schema,
+        };
+      });
     res.json(actionsList);
   });
 

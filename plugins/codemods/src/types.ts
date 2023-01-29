@@ -41,18 +41,36 @@ export type CodemodRun = {
 };
 
 /**
- * The response shape for the `listActions` call to the `codemod-backend`
+ * A single action example
  *
  * @public
  */
-export type ListActionsResponse = Array<{
+export type ActionExample = {
+  description: string;
+  example: string;
+};
+
+/**
+ * A codemod action.
+ *
+ * @public
+ */
+export type Action = {
   id: string;
   description?: string;
   schema?: {
     input?: JSONSchema7;
     output?: JSONSchema7;
   };
-}>;
+  examples?: ActionExample[];
+};
+
+/**
+ * The response shape for the `listActions` call to the `codemod-backend`
+ *
+ * @public
+ */
+export type ListActionsResponse = Action[];
 
 /**
  * @public

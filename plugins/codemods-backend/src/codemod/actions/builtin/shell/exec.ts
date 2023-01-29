@@ -1,5 +1,28 @@
+import yaml from 'yaml';
 import { createCodemodAction } from '../../createCodemodAction';
 import { executeShellCommand, sanitizeWorkspacePath } from '../../helpers';
+
+const id = 'shell:exec';
+
+const examples = [
+  {
+    description: 'Execute a command',
+    example: yaml.stringify({
+      steps: [
+        {
+          action: id,
+          id: 'execute-command',
+          name: 'Run `ls -lh` in the `./repo/` folder',
+          input: {
+            directory: './repo',
+            command: 'ls',
+            args: ['-lh'],
+          },
+        },
+      ],
+    }),
+  },
+];
 
 /**
  * Creates a new action that enables the execution of arbitrary commands.
@@ -11,8 +34,9 @@ export const createShellExecAction = () => {
     args?: string[];
     directory?: string;
   }>({
-    id: 'shell:exec',
+    id,
     description: 'Runs an arbitrary command',
+    examples,
     schema: {
       input: {
         required: ['command'],

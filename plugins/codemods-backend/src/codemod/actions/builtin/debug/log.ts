@@ -1,6 +1,42 @@
 import { readdir, stat } from 'fs-extra';
 import { relative, join } from 'path';
+import yaml from 'yaml';
 import { createCodemodAction } from '../../createCodemodAction';
+
+const id = 'debug:log';
+
+const examples = [
+  {
+    description: 'Write a debug message',
+    example: yaml.stringify({
+      steps: [
+        {
+          action: id,
+          id: 'write-debug-line',
+          name: 'Write "Hello Backstage!" log line',
+          input: {
+            message: 'Hello Backstage!',
+          },
+        },
+      ],
+    }),
+  },
+  {
+    description: 'List the workspace directory',
+    example: yaml.stringify({
+      steps: [
+        {
+          action: id,
+          id: 'write-workspace-directory',
+          name: 'List the workspace directory',
+          input: {
+            listWorkspace: true,
+          },
+        },
+      ],
+    }),
+  },
+];
 
 /**
  * Writes a message into the log or lists all files in the workspace
@@ -14,9 +50,10 @@ import { createCodemodAction } from '../../createCodemodAction';
  */
 export function createDebugLogAction() {
   return createCodemodAction<{ message?: string; listWorkspace?: boolean }>({
-    id: 'debug:log',
+    id,
     description:
       'Writes a message into the log or lists all files in the workspace.',
+    examples,
     schema: {
       input: {
         type: 'object',

@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import useAsync from 'react-use/lib/useAsync';
-import { codemodApiRef } from '../../api';
+import classNames from 'classnames';
 import {
   Typography,
   Paper,
@@ -12,11 +12,14 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Grid,
   makeStyles,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
 } from '@material-ui/core';
 import { JSONSchema7, JSONSchema7Definition } from 'json-schema';
-import classNames from 'classnames';
-
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { useApi } from '@backstage/core-plugin-api';
 import {
   Progress,
@@ -24,7 +27,11 @@ import {
   Header,
   Page,
   ErrorPage,
+  CodeSnippet,
+  MarkdownContent,
 } from '@backstage/core-components';
+import { codemodApiRef } from '../../api';
+import { Action, ActionExample } from '../../types';
 
 const useStyles = makeStyles(theme => ({
   code: {
@@ -50,7 +57,58 @@ const useStyles = makeStyles(theme => ({
       color: theme.palette.error.light,
     },
   },
+
+  sidebar: {
+    position: 'sticky',
+    top: 0,
+  },
 }));
+
+const ExamplesTable = (props: { examples: ActionExample[] }) => {
+  return (
+    <Grid container>
+      {props.examples.map((example, index) => {
+        return (
+          <Fragment key={`example-${index}`}>
+            <Grid item lg={3}>
+              <Box padding={4}>
+                <Typography>{example.description}</Typography>
+              </Box>
+            </Grid>
+            <Grid item lg={9}>
+              <Box padding={1}>
+                <CodeSnippet
+                  text={example.example}
+                  showLineNumbers
+                  showCopyCodeButton
+                  language="yaml"
+                />
+              </Box>
+            </Grid>
+          </Fragment>
+        );
+      })}
+    </Grid>
+  );
+};
+
+const ActionsNavigation = ({ actions }: { actions: Action[] }) => {
+  const classes = useStyles();
+
+  return (
+    <Grid container direction="column" className={classes.sidebar}>
+      {actions.map(action => {
+        return (
+          <Grid item key={`action-summary-${action.id}`} xs={12}>
+            <span className={classes.code}>
+              <a href={`#${action.id}`}>{action.id}</a>
+            </span>
+          </Grid>
+        );
+      })}
+    </Grid>
+  );
+};
 
 export const ActionsPage = () => {
   const api = useApi(codemodApiRef);
@@ -95,7 +153,7 @@ export const ActionsPage = () => {
           <TableCell>
             <>
               {[props.type].flat().map(type => (
-                <Chip label={type} />
+                <Chip label={type} key={type} />
               ))}
             </>
           </TableCell>
@@ -148,10 +206,10 @@ export const ActionsPage = () => {
     const oneOf = renderTables('oneOf', action.schema?.input?.oneOf);
     return (
       <Box pb={4} key={action.id}>
-        <Typography variant="h4" className={classes.code}>
+        <Typography variant="h4" className={classes.code} id={action.id}>
           {action.id}
         </Typography>
-        <Typography>{action.description}</Typography>
+        {action.description && <MarkdownContent content={action.description} />}
         {action.schema?.input && (
           <Box pb={2}>
             <Typography variant="h5">Input</Typography>
@@ -165,6 +223,18 @@ export const ActionsPage = () => {
             {renderTable(action.schema.output)}
           </Box>
         )}
+        {action.examples && (
+          <Accordion>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography variant="h5">Examples</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Box pb={2}>
+                <ExamplesTable examples={action.examples} />
+              </Box>
+            </AccordionDetails>
+          </Accordion>
+        )}
       </Box>
     );
   });
@@ -176,7 +246,19 @@ export const ActionsPage = () => {
         title="Installed actions"
         subtitle="This is the collection of all installed actions"
       />
-      <Content>{items}</Content>
+      <Content>
+        <Grid container direction="row-reverse">
+          {value && (
+            <Grid item md={4} xl={2} xs={12}>
+              <ActionsNavigation actions={value} />
+            </Grid>
+          )}
+
+          <Grid item md={8} xl={10} xs={12}>
+            {items}
+          </Grid>
+        </Grid>
+      </Content>
     </Page>
   );
 };

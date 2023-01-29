@@ -1,9 +1,34 @@
+import yaml from 'yaml';
 import { ScmIntegrationRegistry } from '@backstage/integration';
 import {
   createCodemodAction,
   sanitizeWorkspacePath,
 } from '@k-phoen/plugin-codemods-backend';
 import { pushToBranch } from './helpers';
+
+const id = 'github:repo:push-branch';
+
+const examples = [
+  {
+    description: 'Push changes into a new branch',
+    example: yaml.stringify({
+      steps: [
+        {
+          action: id,
+          id: 'push-changes',
+          name: 'Push changes into a new branch',
+          input: {
+            repoUrl: 'https://github.com/owner/repository',
+            repositoryPath: './repo',
+            add: ['some/file.txt', 'some/directory/'],
+            branchName: 'new-branch',
+            commitMessage: "This is a beautiful commit message, isn't it?",
+          },
+        },
+      ],
+    }),
+  },
+];
 
 /**
  * Creates a new action that commits new content into a branch and pushes it.
@@ -20,8 +45,9 @@ export function createGithubPushBranchAction(options: {
     branchName: string;
     commitMessage: string;
   }>({
-    id: 'github:repo:push-branch',
+    id,
     description: 'Commits and pushes new content into a branch.',
+    examples,
     schema: {
       input: {
         type: 'object',

@@ -55,6 +55,7 @@
     "uuid": "^8.2.0",
     "vm2": "^3.9.11",
     "winston": "^3.2.1",
+    "yaml": "^2.2.1",
     "zen-observable": "^0.10.0"
   },
   "devDependencies": {

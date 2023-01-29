@@ -1,7 +1,58 @@
+import yaml from 'yaml';
 import { rmSync } from 'fs';
 import { Logger } from 'winston';
 import { createCodemodAction } from '../../createCodemodAction';
 import { sanitizeWorkspacePath } from '../../helpers';
+
+const id = 'fs:delete';
+
+const examples = [
+  {
+    description: 'Delete a file',
+    example: yaml.stringify({
+      steps: [
+        {
+          action: id,
+          id: 'delete-file',
+          name: 'Delete a file',
+          input: {
+            targets: ['./some/file.txt'],
+          },
+        },
+      ],
+    }),
+  },
+  {
+    description: 'Delete a directory',
+    example: yaml.stringify({
+      steps: [
+        {
+          action: id,
+          id: 'delete-directory',
+          name: 'Delete a directory',
+          input: {
+            targets: ['./some/directory'],
+          },
+        },
+      ],
+    }),
+  },
+  {
+    description: 'Delete a multiple targets',
+    example: yaml.stringify({
+      steps: [
+        {
+          action: id,
+          id: 'delete-multiple',
+          name: 'Delete multiple targets',
+          input: {
+            targets: ['./some/directory', './some/file.txt'],
+          },
+        },
+      ],
+    }),
+  },
+];
 
 /**
  * Creates new action that enables deletion of files and directories in the workspace.
@@ -9,8 +60,9 @@ import { sanitizeWorkspacePath } from '../../helpers';
  */
 export const createFsDeleteAction = () => {
   return createCodemodAction<{ targets: string[] }>({
-    id: 'fs:delete',
+    id,
     description: 'Deletes files and directories from the workspace',
+    examples,
     schema: {
       input: {
         required: ['targets'],
