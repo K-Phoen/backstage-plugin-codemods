@@ -1,13 +1,13 @@
 import type { EntityMeta, UserEntity } from '@backstage/catalog-model';
 import type { JsonObject, JsonValue } from '@backstage/types';
-import { ConstraintsQuery } from './CodemodEntityV1alpha1';
+import { CatalogFiltersV1alpha1 } from './CodemodEntityV1alpha1';
 
 /**
  * Information about a codemod that is stored on a run specification.
  *
  * @public
  */
-export type CodemodInfo = {
+export type CodemodInfoV1alpha1 = {
   /**
    * The entityRef of the codemod
    */
@@ -30,11 +30,16 @@ export type CodemodInfo = {
 };
 
 /**
+ * @see CodemodInfoV1alpha1
+ */
+export type CodemodInfo = CodemodInfoV1alpha1;
+
+/**
  * An individual step of a codemod job, as stored in the database.
  *
  * @public
  */
-export interface JobStep {
+export interface JobStepV1alpha1 {
   /**
    * A unqiue identifier for this step.
    */
@@ -58,24 +63,29 @@ export interface JobStep {
 }
 
 /**
+ * @see JobStepV1alpha1
+ */
+export type JobStep = JobStepV1alpha1;
+
+/**
  * A codemod run as stored in the database, generated from a v1alpha1
  * apiVersion Codemod.
  *
  * @public
  */
-export interface CodemodSpecV1alpha1 {
+export interface CodemodRunSpecV1alpha1 {
   /**
-   * The apiVersion string of the TaskSpec.
+   * The apiVersion string of the CodemodRunSpec.
    */
   apiVersion: 'codemod.backstage.io/v1alpha1';
   /**
    * A set of catalog filters, defining the targets of the codemod.
    */
-  targets: ConstraintsQuery;
+  targets: CatalogFiltersV1alpha1;
   /**
    * Set of constraints describing entities on which the codemod can be applied.
    */
-  constraints?: ConstraintsQuery;
+  constraints?: CatalogFiltersV1alpha1;
   /**
    * This is a JSONSchema which is used to render a form in the frontend
    * to collect user input and validate it against that schema. This can then be used in the `steps` part below to template
@@ -86,7 +96,7 @@ export interface CodemodSpecV1alpha1 {
    * A list of steps to be executed in sequence which are defined by the codemod. These steps are a list of the underlying
    * javascript action and some optional input parameters that may or may not have been collected from the end user.
    */
-  steps: JobStep[];
+  steps: JobStepV1alpha1[];
   /**
    * The output is an object where codemod authors can pull out information from codemod actions and return them in a known standard way.
    */
@@ -94,17 +104,17 @@ export interface CodemodSpecV1alpha1 {
   /**
    * Some information about the codemod itself.
    */
-  codemodInfo?: CodemodInfo;
+  codemodInfo?: CodemodInfoV1alpha1;
   /**
-   * Some decoration of the author of the task that should be available in the context
+   * Information on the user who triggered the codemod run.
    */
   user?: {
     /**
-     * The decorated entity from the Catalog
+     * The user entity from the Catalog
      */
     entity?: UserEntity;
     /**
-     * An entity ref for the author of the task
+     * An entity ref for the user
      */
     ref?: string;
   };
@@ -115,4 +125,4 @@ export interface CodemodSpecV1alpha1 {
  *
  * @public
  */
-export type CodemodRunSpec = CodemodSpecV1alpha1;
+export type CodemodRunSpec = CodemodRunSpecV1alpha1;

@@ -1,6 +1,6 @@
 import { CatalogApi } from '@backstage/catalog-client';
 import { Entity } from '@backstage/catalog-model';
-import { JobSpec } from '@k-phoen/plugin-codemods-common';
+import { CodemodRunSpec } from '@k-phoen/plugin-codemods-common';
 import { JsonObject, Observable } from '@backstage/types';
 import { Logger } from 'winston';
 import ObservableImpl from 'zen-observable';
@@ -27,34 +27,32 @@ export class JobManager implements JobContext {
   private heartbeatTimeoutId?: ReturnType<typeof setInterval>;
 
   static create(
-    job: CurrentClaimedJob,
+    jobId: string,
+    codemod: CodemodRunSpec,
     target: Entity,
     storage: RunStore,
     logger: Logger,
   ) {
-    const agent = new JobManager(job, target, storage, logger);
+    const agent = new JobManager(jobId, codemod, target, storage, logger);
     agent.startTimeout();
     return agent;
   }
 
   // Runs heartbeat internally
   private constructor(
-    private readonly job: CurrentClaimedJob,
+    private readonly jobId: string,
+    private readonly codemod: CodemodRunSpec,
     readonly target: Entity,
     private readonly storage: RunStore,
     private readonly logger: Logger,
   ) {}
 
   get spec() {
-    return this.job.spec;
-  }
-
-  get createdBy() {
-    return this.job.createdBy;
+    return this.codemod;
   }
 
   async getWorkspaceName() {
-    return this.job.jobId;
+    return this.jobId;
   }
 
   get done() {
@@ -63,7 +61,7 @@ export class JobManager implements JobContext {
 
   async emitLog(message: string, logMetadata?: JsonObject): Promise<void> {
     await this.storage.emitLogEvent({
-      jobId: this.job.jobId,
+      jobId: this.jobId,
       body: { message, ...logMetadata },
     });
   }
@@ -73,7 +71,7 @@ export class JobManager implements JobContext {
     metadata?: JsonObject,
   ): Promise<void> {
     await this.storage.completeJob({
-      jobId: this.job.jobId,
+      jobId: this.jobId,
       status: result === 'failed' ? 'failed' : 'completed',
       eventBody: {
         message: `Run completed with status: ${result}`,
@@ -91,34 +89,14 @@ export class JobManager implements JobContext {
   private startTimeout() {
     this.heartbeatTimeoutId = setTimeout(async () => {
       try {
-        await this.storage.heartbeatJob(this.job.jobId);
+        await this.storage.heartbeatJob(this.jobId);
         this.startTimeout();
       } catch (error) {
         this.isDone = true;
-        this.logger.error(`Heartbeat for job ${this.job.jobId} failed`, error);
+        this.logger.error(`Heartbeat for job ${this.jobId} failed`, error);
       }
     }, 1000);
   }
-}
-
-/**
- * Stores the state of the current claimed job passed to the JobContext
- *
- * @public
- */
-export interface CurrentClaimedJob {
-  /**
-   * The JobSpec of the current claimed job.
-   */
-  spec: JobSpec;
-  /**
-   * The uuid of the current claimed job.
-   */
-  jobId: string;
-  /**
-   * The creator of the job.
-   */
-  createdBy?: string;
 }
 
 function defer() {
@@ -172,14 +150,8 @@ export class StorageJobBroker implements JobBroker {
         }
 
         return JobManager.create(
-          {
-            jobId: pendingJob.id,
-            spec: {
-              codemod: run.spec,
-              targetRef: pendingJob.target,
-            },
-            createdBy: run.createdBy,
-          },
+          pendingJob.id,
+          run.spec,
           target,
           this.storage,
           this.logger,

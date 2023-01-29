@@ -64,20 +64,23 @@
               "description": "Set of constraints describing entities on which the codemod can be applied."
             },
             "parameters": {
-              "oneOf": [
-                {
-                  "type": "object",
-                  "description": "The JSONSchema describing the inputs for the codemod."
+              "type": "object",
+              "description": "Parameters required by the codemod.",
+              "required": ["title"],
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "description": "Title."
                 },
-                {
+                "required": {
                   "type": "array",
-                  "description": "A list of separate forms to collect parameters.",
-                  "items": {
-                    "type": "object",
-                    "description": "The JSONSchema describing the inputs for the codemod."
-                  }
+                  "description": "Which of the parameters are required.",
+                  "items": { "type": "string" }
+                },
+                "properties": {
+                  "type": "object"
                 }
-              ]
+              }
             },
             "steps": {
               "type": "array",

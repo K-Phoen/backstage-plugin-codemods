@@ -26,7 +26,6 @@ describe('<ListRunsPage />', () => {
   };
 
   const codemodApiMock: jest.Mocked<Required<CodemodApi>> = {
-    scaffold: jest.fn(),
     getTemplateParameterSchema: jest.fn(),
     listRuns: jest.fn(),
   } as any;

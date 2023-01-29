@@ -1,7 +1,7 @@
+import { Schema } from 'jsonschema';
 import { Logger } from 'winston';
 import { Writable } from 'stream';
 import { JsonValue, JsonObject } from '@backstage/types';
-import { Schema } from 'jsonschema';
 import { Entity, UserEntity } from '@backstage/catalog-model';
 import { CodemodInfo } from '@k-phoen/plugin-codemods-common';
 
@@ -14,12 +14,6 @@ export type ActionContext<Input extends JsonObject> = {
   logStream: Writable;
   workspacePath: string;
   input: Input;
-  output(name: string, value: JsonValue): void;
-
-  /**
-   * Creates a temporary directory for use by the action, which is then cleaned up automatically.
-   */
-  createTemporaryDirectory(): Promise<string>;
 
   codemodInfo?: CodemodInfo;
 
@@ -44,16 +38,49 @@ export type ActionContext<Input extends JsonObject> = {
      */
     ref?: string;
   };
+
+  output(name: string, value: JsonValue): void;
+
+  /**
+   * Creates a temporary directory for use by the action, which is then cleaned up automatically.
+   */
+  createTemporaryDirectory(): Promise<string>;
 };
 
 /** @public */
 export type CodemodAction<Input extends JsonObject> = {
+  /**
+   * Identifier of the action.
+   */
   id: string;
+
+  /**
+   * Human-readable description of what the action does.
+   */
   description?: string;
-  examples?: { description: string; example: string }[];
+
+  /**
+   * Examples documenting the action's usage.
+   */
+  examples?: {
+    /**
+     * Brief explanation of what the example is showing.
+     */
+    description: string;
+
+    /**
+     * Actual code of the example (in YAML).
+     */
+    example: string;
+  }[];
+
+  /**
+   * Schema describing the inputs/outputs of the action.
+   */
   schema?: {
     input?: Schema;
     output?: Schema;
   };
+
   handler: (ctx: ActionContext<Input>) => Promise<void>;
 };

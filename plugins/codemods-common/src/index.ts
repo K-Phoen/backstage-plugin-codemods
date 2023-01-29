@@ -4,12 +4,6 @@
  * @packageDocumentation
  */
 
-export * from './JobSpec';
 export * from './CodemodRunSpec';
 export * from './helpers';
-export { codemodEntityV1alpha1Validator } from './CodemodEntityV1alpha1';
-export type {
-  CodemodEntity,
-  CodemodEntityV1alpha1,
-  ConstraintsQuery,
-} from './CodemodEntityV1alpha1';
+export * from './CodemodEntityV1alpha1';

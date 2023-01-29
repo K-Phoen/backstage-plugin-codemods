@@ -1,5 +1,5 @@
 import { JsonValue, JsonObject, Observable } from '@backstage/types';
-import { CodemodRunSpec, JobSpec } from '@k-phoen/plugin-codemods-common';
+import { CodemodRunSpec } from '@k-phoen/plugin-codemods-common';
 import { Entity } from '@backstage/catalog-model';
 
 /**
@@ -90,7 +90,7 @@ export type JobBrokerDispatchResult = {
  */
 export type JobBrokerDispatchOptions = {
   codemodSpec: CodemodRunSpec;
-  jobsSpecs: JobSpec[];
+  targets: string[];
   createdBy?: string;
 };
 
@@ -100,9 +100,8 @@ export type JobBrokerDispatchOptions = {
  * @public
  */
 export interface JobContext {
-  spec: JobSpec;
+  spec: CodemodRunSpec;
   target: Entity;
-  createdBy?: string;
   done: boolean;
   emitLog(message: string, logMetadata?: JsonObject): Promise<void>;
   complete(result: JobCompletionState, metadata?: JsonObject): Promise<void>;
@@ -165,7 +164,7 @@ export type RunStoreShutDownJobOptions = {
  */
 export type RunStoreCreateRunOptions = {
   codemodSpec: CodemodRunSpec;
-  jobsSpecs: JobSpec[];
+  targets: string[]; // list of catalog entity references
   createdBy?: string;
 };
 

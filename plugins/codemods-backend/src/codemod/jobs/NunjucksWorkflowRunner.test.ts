@@ -3,9 +3,9 @@ import * as winston from 'winston';
 
 import { getVoidLogger, resolvePackagePath } from '@backstage/backend-common';
 import { parseEntityRef, UserEntity } from '@backstage/catalog-model';
-import { JobSpec } from '@k-phoen/plugin-codemods-common';
+import { CodemodRunSpec } from '@k-phoen/plugin-codemods-common';
 import { NunjucksWorkflowRunner } from './NunjucksWorkflowRunner';
-import { CodemodActionRegistry } from '../actions';
+import { ActionRegistry } from '../actions';
 import { JobContext } from './types';
 
 // The Stream module is lazy loaded, so make sure it's in the module cache before mocking fs
@@ -23,18 +23,24 @@ const realFiles = Object.fromEntries(
 
 describe('DefaultWorkflowRunner', () => {
   const logger = getVoidLogger();
-  let actionRegistry = new CodemodActionRegistry();
+  let actionRegistry = new ActionRegistry();
   let runner: NunjucksWorkflowRunner;
   let fakeActionHandler: jest.Mock;
 
-  const createMockJobWithSpec = (spec: JobSpec): JobContext => ({
-    spec,
+  const createMockJobWithSpec = ({
+    codemod,
+    targetRef,
+  }: {
+    codemod: CodemodRunSpec;
+    targetRef: string;
+  }): JobContext => ({
+    spec: codemod,
     target: {
       apiVersion: 'backstage.io/v1alpha1',
-      kind: parseEntityRef(spec.targetRef).kind,
+      kind: parseEntityRef(targetRef).kind,
       metadata: {
-        namespace: parseEntityRef(spec.targetRef).namespace,
-        name: parseEntityRef(spec.targetRef).name,
+        namespace: parseEntityRef(targetRef).namespace,
+        name: parseEntityRef(targetRef).name,
       },
       spec: {},
     },
@@ -52,7 +58,7 @@ describe('DefaultWorkflowRunner', () => {
     });
 
     jest.resetAllMocks();
-    actionRegistry = new CodemodActionRegistry();
+    actionRegistry = new ActionRegistry();
     fakeActionHandler = jest.fn();
 
     actionRegistry.register({

@@ -4,6 +4,7 @@ import {
   parseLocationRef,
   ANNOTATION_SOURCE_LOCATION,
 } from '@backstage/catalog-model';
+import { CatalogFilters } from './CodemodEntityV1alpha1';
 
 /**
  * Gets the base URL of the entity location that points to the source location
@@ -33,15 +34,45 @@ export function getEntityBaseUrl(entity: Entity): string | undefined {
   return undefined;
 }
 
+/**
+ * Returns the intersection of the a and b lists.
+ */
 export const intersect = <T>(a: T[], b: T[]): T[] => {
   const intersection = new Set(a.filter(x => b.includes(x)));
   return Array.from(intersection);
 };
 
+/**
+ * Ensures the given value is a list.
+ */
 export const toList = <T>(input?: T | T[]): T[] => {
   if (!input) {
     return [];
   }
 
   return Array.isArray(input) ? input : [input];
+};
+
+/**
+ * Constraints the given set of targets using constraints defined on a codemod.
+ * Returns a new set of constraints, describing catalog entities satisfying both
+ * the filters defined by `targets` and `constaints`.
+ */
+export const constrainTargets = (
+  targets: CatalogFilters,
+  constraints: CatalogFilters,
+): CatalogFilters => {
+  const merged: CatalogFilters = { ...constraints };
+
+  for (const [key, value] of Object.entries(targets)) {
+    // no constraint on `key`
+    if (!constraints[key]) {
+      merged[key] = value;
+      continue;
+    }
+
+    merged[key] = intersect(toList(targets[key]), toList(constraints[key]));
+  }
+
+  return merged;
 };

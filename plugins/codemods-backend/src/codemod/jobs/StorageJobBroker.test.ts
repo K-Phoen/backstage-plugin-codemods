@@ -1,10 +1,12 @@
 import { getVoidLogger, DatabaseManager } from '@backstage/backend-common';
 import { CatalogApi } from '@backstage/catalog-client';
-import { ConfigReader } from '@backstage/config';
 import {
-  CodemodRunSpec,
-  CodemodSpecV1alpha1,
-} from '@k-phoen/plugin-codemods-common';
+  Entity,
+  parseEntityRef,
+  stringifyEntityRef,
+} from '@backstage/catalog-model';
+import { ConfigReader } from '@backstage/config';
+import { CodemodRunSpec } from '@k-phoen/plugin-codemods-common';
 import { DatabaseRunStore } from './DatabaseRunStore';
 import { JobManager, StorageJobBroker } from './StorageJobBroker';
 import { RunStore, SerializedJobEvent } from './types';
@@ -29,8 +31,16 @@ async function createStore(): Promise<RunStore> {
 describe('StorageJobBroker', () => {
   let storage: RunStore;
   const catalog = {
-    getEntityByRef: jest.fn(async (_entityRef: string) => {
-      return {};
+    getEntityByRef: jest.fn(async (entityRef: string) => {
+      const parsedRef = parseEntityRef(entityRef);
+
+      return {
+        kind: parsedRef.kind,
+        metadata: {
+          namespace: parsedRef.namespace,
+          name: parsedRef.name,
+        },
+      } as Entity;
     }),
   } as unknown as CatalogApi;
   const logger = getVoidLogger();
@@ -44,12 +54,7 @@ describe('StorageJobBroker', () => {
   it('should claim a dispatched work item', async () => {
     await broker.dispatch({
       codemodSpec: {} as CodemodRunSpec,
-      jobsSpecs: [
-        {
-          codemod: {} as CodemodSpecV1alpha1,
-          targetRef: 'component:default/target',
-        },
-      ],
+      targets: ['component:default/target'],
     });
 
     await expect(broker.claim()).resolves.toEqual(
@@ -64,12 +69,7 @@ describe('StorageJobBroker', () => {
 
     await broker.dispatch({
       codemodSpec: {} as CodemodRunSpec,
-      jobsSpecs: [
-        {
-          codemod: {} as CodemodSpecV1alpha1,
-          targetRef: 'component:default/target',
-        },
-      ],
+      targets: ['component:default/target'],
     });
     await expect(promise).resolves.toEqual(expect.any(JobManager as any));
   });
@@ -77,30 +77,15 @@ describe('StorageJobBroker', () => {
   it('should dispatch multiple items and claim them in order', async () => {
     await broker.dispatch({
       codemodSpec: {} as CodemodRunSpec,
-      jobsSpecs: [
-        {
-          codemod: {} as CodemodSpecV1alpha1,
-          targetRef: 'component:default/target-a',
-        },
-      ],
+      targets: ['component:default/target-a'],
     });
     await broker.dispatch({
       codemodSpec: {} as CodemodRunSpec,
-      jobsSpecs: [
-        {
-          codemod: {} as CodemodSpecV1alpha1,
-          targetRef: 'component:default/target-b',
-        },
-      ],
+      targets: ['component:default/target-b'],
     });
     await broker.dispatch({
       codemodSpec: {} as CodemodRunSpec,
-      jobsSpecs: [
-        {
-          codemod: {} as CodemodSpecV1alpha1,
-          targetRef: 'component:default/target-c',
-        },
-      ],
+      targets: ['component:default/target-c'],
     });
 
     const jobA = await broker.claim();
@@ -109,20 +94,21 @@ describe('StorageJobBroker', () => {
     await expect(jobA).toEqual(expect.any(JobManager as any));
     await expect(jobB).toEqual(expect.any(JobManager as any));
     await expect(jobC).toEqual(expect.any(JobManager as any));
-    await expect(jobA.spec.targetRef).toBe('component:default/target-a');
-    await expect(jobB.spec.targetRef).toBe('component:default/target-b');
-    await expect(jobC.spec.targetRef).toBe('component:default/target-c');
+    await expect(stringifyEntityRef(jobA.target)).toBe(
+      'component:default/target-a',
+    );
+    await expect(stringifyEntityRef(jobB.target)).toBe(
+      'component:default/target-b',
+    );
+    await expect(stringifyEntityRef(jobC.target)).toBe(
+      'component:default/target-c',
+    );
   });
 
   it('should complete a job', async () => {
     const dispatchResult = await broker.dispatch({
       codemodSpec: {} as CodemodRunSpec,
-      jobsSpecs: [
-        {
-          codemod: {} as CodemodSpecV1alpha1,
-          targetRef: 'component:default/target',
-        },
-      ],
+      targets: ['component:default/target'],
     });
     const job = await broker.claim();
     await job.complete('completed');
@@ -133,12 +119,7 @@ describe('StorageJobBroker', () => {
   it('should fail a job', async () => {
     const dispatchResult = await broker.dispatch({
       codemodSpec: {} as CodemodRunSpec,
-      jobsSpecs: [
-        {
-          codemod: {} as CodemodSpecV1alpha1,
-          targetRef: 'component:default/target',
-        },
-      ],
+      targets: ['component:default/target'],
     });
     const job = await broker.claim();
     await job.complete('failed');
@@ -152,12 +133,7 @@ describe('StorageJobBroker', () => {
 
     const { runId } = await broker.dispatch({
       codemodSpec: {} as CodemodRunSpec,
-      jobsSpecs: [
-        {
-          codemod: {} as CodemodSpecV1alpha1,
-          targetRef: 'component:default/target',
-        },
-      ],
+      targets: ['component:default/target'],
     });
 
     const { jobs } = await storage.listJobs({ run: runId });
@@ -206,12 +182,7 @@ describe('StorageJobBroker', () => {
   it('should heartbeat', async () => {
     const { runId } = await broker.dispatch({
       codemodSpec: {} as CodemodRunSpec,
-      jobsSpecs: [
-        {
-          codemod: {} as CodemodSpecV1alpha1,
-          targetRef: 'component:default/target',
-        },
-      ],
+      targets: ['component:default/target'],
     });
     const job = await broker.claim();
 
@@ -233,12 +204,7 @@ describe('StorageJobBroker', () => {
   it('should be update the status to failed if heartbeat fails', async () => {
     const { runId } = await broker.dispatch({
       codemodSpec: {} as CodemodRunSpec,
-      jobsSpecs: [
-        {
-          codemod: {} as CodemodSpecV1alpha1,
-          targetRef: 'component:default/target',
-        },
-      ],
+      targets: ['component:default/target'],
     });
     const job = await broker.claim();
 
@@ -267,12 +233,7 @@ describe('StorageJobBroker', () => {
   it('should list all runs and their jobs', async () => {
     const { runId } = await broker.dispatch({
       codemodSpec: {} as CodemodRunSpec,
-      jobsSpecs: [
-        {
-          codemod: {} as CodemodSpecV1alpha1,
-          targetRef: 'component:default/target',
-        },
-      ],
+      targets: ['component:default/target'],
     });
 
     const runsPpromise = broker.listRuns();
@@ -297,12 +258,7 @@ describe('StorageJobBroker', () => {
   it('should list only tasks createdBy a specific user', async () => {
     const { runId } = await broker.dispatch({
       codemodSpec: {} as CodemodRunSpec,
-      jobsSpecs: [
-        {
-          codemod: {} as CodemodSpecV1alpha1,
-          targetRef: 'component:default/target',
-        },
-      ],
+      targets: ['component:default/target'],
       createdBy: 'user:default/foo',
     });
 

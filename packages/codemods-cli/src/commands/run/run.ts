@@ -7,7 +7,7 @@ import {
 } from '@backstage/catalog-model';
 import { JsonObject } from '@backstage/types';
 import {
-  CodemodActionRegistry,
+  ActionRegistry,
   createBuiltinActions,
   JobBroker,
   JobWorker,
@@ -44,10 +44,7 @@ export default async function run(opts: RunOptions) {
   );
 
   // actions setup
-  const actionRegistry = new CodemodActionRegistry();
-  const builtInActions = createBuiltinActions();
-
-  builtInActions.forEach(action => actionRegistry.register(action));
+  const actionRegistry = ActionRegistry.create(createBuiltinActions());
 
   // dependencies setup
   const workingDirectory = tmpdir();
@@ -83,19 +80,13 @@ export default async function run(opts: RunOptions) {
     output: codemod.spec.output ?? {},
   };
 
-  const jobDescriptor = {
-    jobId: `codemods-cli-job-${Date.now()}`,
-    spec: {
-      codemod: codemodRunSpec,
-      targetRef: stringifyEntityRef(entity),
-    },
-  };
+  const jobId = `codemods-cli-job-${Date.now()}`;
 
   // start executing the codemod!
   await jobWorker.runOneJob(
-    JobManager.create(jobDescriptor, entity, codemodLogger),
+    JobManager.create(jobId, codemodRunSpec, entity, codemodLogger),
   );
 
   logger.info('Done!');
-  logger.info(`Working directory: ${workingDirectory}/${jobDescriptor.jobId}`);
+  logger.info(`Working directory: ${workingDirectory}/${jobId}`);
 }

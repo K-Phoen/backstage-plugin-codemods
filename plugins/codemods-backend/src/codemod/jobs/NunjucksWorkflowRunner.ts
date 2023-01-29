@@ -8,23 +8,27 @@ import { InputError } from '@backstage/errors';
 import { PassThrough } from 'stream';
 import { isTruthy } from './helper';
 import { validate as validateJsonSchema } from 'jsonschema';
-import { CodemodActionRegistry } from '../actions';
+import { ActionRegistry } from '../actions';
 import {
   TemplateFilter,
   SecureTemplater,
   SecureTemplateRenderer,
   TemplateGlobal,
 } from '../../lib/templating/SecureTemplater';
-import { Entity, UserEntity } from '@backstage/catalog-model';
 import {
-  JobSpec,
-  JobSpecV1alpha1,
+  Entity,
+  stringifyEntityRef,
+  UserEntity,
+} from '@backstage/catalog-model';
+import {
+  CodemodRunSpec,
+  CodemodRunSpecV1alpha1,
   JobStep,
 } from '@k-phoen/plugin-codemods-common';
 
 type NunjucksWorkflowRunnerOptions = {
   workingDirectory: string;
-  actionRegistry: CodemodActionRegistry;
+  actionRegistry: ActionRegistry;
   logger: winston.Logger;
   additionalTemplateFilters?: Record<string, TemplateFilter>;
   additionalTemplateGlobals?: Record<string, TemplateGlobal>;
@@ -45,8 +49,10 @@ type TemplateContext = {
   };
 };
 
-const isValidJobSpec = (jobSpec: JobSpec): jobSpec is JobSpecV1alpha1 => {
-  return jobSpec.codemod.apiVersion === 'codemod.backstage.io/v1alpha1';
+const isValidJobSpec = (
+  spec: CodemodRunSpec,
+): spec is CodemodRunSpecV1alpha1 => {
+  return spec.apiVersion === 'codemod.backstage.io/v1alpha1';
 };
 
 const createStepLogger = ({
@@ -184,20 +190,22 @@ export class NunjucksWorkflowRunner implements WorkflowRunner {
       },
     });
 
+    const targetRef = stringifyEntityRef(job.target);
+
     try {
       await fs.ensureDir(workspacePath);
 
       const context: TemplateContext = {
-        parameters: job.spec.codemod.parameters,
+        parameters: job.spec.parameters,
         steps: {},
-        user: job.spec.codemod.user,
+        user: job.spec.user,
         target: {
           entity: job.target,
-          ref: job.spec.targetRef,
+          ref: targetRef,
         },
       };
 
-      for (const step of job.spec.codemod.steps) {
+      for (const step of job.spec.steps) {
         await job.emitLog(`Beginning step ${step.name}`, {
           stepId: step.id,
           status: 'processing',
@@ -258,12 +266,12 @@ export class NunjucksWorkflowRunner implements WorkflowRunner {
             output(name: string, value: JsonValue) {
               stepOutput[name] = value;
             },
-            codemodInfo: job.spec.codemod.codemodInfo,
+            codemodInfo: job.spec.codemodInfo,
             target: {
               entity: job.target,
-              ref: job.spec.targetRef,
+              ref: targetRef,
             },
-            user: job.spec.codemod.user,
+            user: job.spec.user,
           });
 
           // Remove all temporary directories that were created when executing the action
@@ -286,15 +294,11 @@ export class NunjucksWorkflowRunner implements WorkflowRunner {
         }
       }
 
-      if (!job.spec.codemod.output) {
+      if (!job.spec.output) {
         return { output: {} };
       }
 
-      const output = this.render(
-        job.spec.codemod.output,
-        context,
-        renderTemplate,
-      );
+      const output = this.render(job.spec.output, context, renderTemplate);
 
       return { output };
     } finally {

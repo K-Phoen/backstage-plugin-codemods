@@ -98,13 +98,14 @@ function doRemove({
   targets: string[];
   logger: Logger;
 }): void {
-  const filteredTargets = targets.filter(target => target.trim().length !== 0);
-  const fullPaths = filteredTargets.map(target =>
-    sanitizeWorkspacePath(workspace, target),
-  );
-
-  fullPaths.forEach(fullPath => {
-    logger.info(`rm ${fullPath}`);
-    rmSync(fullPath, { recursive: true });
-  });
+  targets
+    // remove "empty" targets
+    .filter(target => target.trim().length !== 0)
+    // make sure the path is clean
+    .map(target => sanitizeWorkspacePath(workspace, target))
+    // and delete!
+    .forEach(fullPath => {
+      logger.info(`Deleting ${fullPath}`);
+      rmSync(fullPath, { recursive: true });
+    });
 }
