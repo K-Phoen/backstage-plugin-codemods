@@ -1,6 +1,28 @@
+import yaml from 'yaml';
 import { writeFile } from 'fs/promises';
 import { createCodemodAction } from '../../createCodemodAction';
 import { sanitizeWorkspacePath } from '../../helpers';
+
+const id = 'fs:write';
+
+const examples = [
+  {
+    description: 'Write to a file',
+    example: yaml.stringify({
+      steps: [
+        {
+          action: id,
+          id: 'update-codeowners',
+          name: 'Update the CODEOWNERS file',
+          input: {
+            to: './repo/.github/CODEOWNERS',
+            content: '* ${{ parameters.owner }}',
+          },
+        },
+      ],
+    }),
+  },
+];
 
 /**
  * Creates an action that writes content into a file.
@@ -9,8 +31,9 @@ import { sanitizeWorkspacePath } from '../../helpers';
  */
 export function createFsWriteAction() {
   return createCodemodAction<{ to: string; content: string }>({
-    id: 'fs:write',
+    id,
     description: 'Writes content into a file in the workspace.',
+    examples,
     schema: {
       input: {
         type: 'object',

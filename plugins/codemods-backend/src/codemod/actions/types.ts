@@ -50,6 +50,7 @@ export type ActionContext<Input extends JsonObject> = {
 export type CodemodAction<Input extends JsonObject> = {
   id: string;
   description?: string;
+  examples?: { description: string; example: string }[];
   schema?: {
     input?: Schema;
     output?: Schema;
