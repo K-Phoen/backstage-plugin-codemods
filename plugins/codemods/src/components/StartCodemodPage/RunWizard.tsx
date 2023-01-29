@@ -34,7 +34,6 @@ import {
   CodemodReview,
   TargetSelector,
 } from './steps';
-import { CodemodParameterSchema } from '../../types';
 import { IChangeEvent } from '@rjsf/core';
 
 type CodemodSetupStep = {
@@ -44,7 +43,6 @@ type CodemodSetupStep = {
 
 type StepperProps = {
   codemod: CodemodEntityV1alpha1;
-  parameterSchema: CodemodParameterSchema;
   formData: Record<string, any>;
 
   onSubmit: () => void;
@@ -53,7 +51,6 @@ type StepperProps = {
 
 const CodemodStepper = ({
   codemod,
-  parameterSchema,
   formData,
   onSubmit,
   onChange,
@@ -71,7 +68,7 @@ const CodemodStepper = ({
       label: 'Parameters',
       component: (
         <CodemodParameters
-          schema={parameterSchema}
+          codemod={codemod}
           formData={formData}
           onChange={onChange}
         />
@@ -86,7 +83,7 @@ const CodemodStepper = ({
     },
     {
       label: 'Review and apply',
-      component: <CodemodReview codemod={codemod} />,
+      component: <CodemodReview codemod={codemod} formData={formData} />,
     },
   );
 
@@ -154,10 +151,7 @@ export const RunWizard = () => {
   const codemodRunRoute = useRouteRef(codemodRunRouteRef);
   const rootRoute = useRouteRef(rootRouteRef);
   const { value, loading, error } = useAsync(() => {
-    const codemod = catalogApi.getEntityByRef(codemodRef);
-    const parameterSchema = codemodApi.getTemplateParameterSchema(codemodRef);
-
-    return Promise.all([codemod, parameterSchema]);
+    return catalogApi.getEntityByRef(codemodRef);
   });
 
   // parameters management
@@ -210,15 +204,14 @@ export const RunWizard = () => {
   return (
     <>
       {loading && <Progress data-testid="loading-progress" />}
-      {value && value[0] && value[1] && (
+      {value && (
         <InfoCard
-          title={value![0].metadata.title || value![0].metadata.name}
+          title={value.metadata.title || value.metadata.name}
           noPadding
           titleTypographyProps={{ component: 'h2' }}
         >
           <CodemodStepper
-            codemod={value![0] as CodemodEntityV1alpha1}
-            parameterSchema={value![1]}
+            codemod={value as CodemodEntityV1alpha1}
             formData={formState}
             onSubmit={handleCreate}
             onChange={handleChange}

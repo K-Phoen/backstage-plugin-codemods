@@ -7,7 +7,6 @@ import { ApiProvider } from '@backstage/core-app-api';
 import { CodemodApi } from '../../types';
 
 const codemodApiMock: jest.Mocked<CodemodApi> = {
-  getTemplateParameterSchema: jest.fn(),
   applyCodemod: jest.fn(),
   listRuns: jest.fn(),
   getRun: jest.fn(),

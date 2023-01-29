@@ -1,6 +1,6 @@
 import { EntityFilterQuery } from '@backstage/catalog-client';
 import { CodemodRunSpec } from '@k-phoen/plugin-codemods-common';
-import { JsonObject, Observable } from '@backstage/types';
+import { Observable } from '@backstage/types';
 import { JSONSchema7 } from 'json-schema';
 
 /**
@@ -138,31 +138,11 @@ export type LogEvent = {
 };
 
 /**
- * The shape of each entry of parameters which gets rendered
- * as a separate step in the wizard input
- *
- * @public
- */
-export type CodemodParameterSchema = {
-  title: string;
-  description?: string;
-  steps: Array<{
-    title: string;
-    description?: string;
-    schema: JsonObject;
-  }>;
-};
-
-/**
  * An API to interact with the codemod backend.
  *
  * @public
  */
 export interface CodemodApi {
-  getTemplateParameterSchema(
-    codemodRef: string,
-  ): Promise<CodemodParameterSchema>;
-
   /**
    * Executes a codemod on catalog entities.
    *

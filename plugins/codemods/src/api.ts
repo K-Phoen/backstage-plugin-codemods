@@ -1,4 +1,3 @@
-import { parseEntityRef } from '@backstage/catalog-model';
 import {
   createApiRef,
   DiscoveryApi,
@@ -13,7 +12,6 @@ import {
   CodemodApi,
   CodemodApplyOptions,
   CodemodApplyResponse,
-  CodemodParameterSchema,
   CodemodRun,
   Job,
   ListActionsResponse,
@@ -48,24 +46,6 @@ export class CodemodClient implements CodemodApi {
     this.discoveryApi = options.discoveryApi;
     this.fetchApi = options.fetchApi ?? { fetch };
     this.identityApi = options.identityApi;
-  }
-
-  async getTemplateParameterSchema(
-    codemodRef: string,
-  ): Promise<CodemodParameterSchema> {
-    const { namespace, name } = parseEntityRef(codemodRef, {
-      defaultKind: 'codemod',
-    });
-
-    const baseUrl = await this.baseUrl();
-    const url = `${baseUrl}/v1/codemods/${namespace}/${name}/parameter-schema`;
-
-    const response = await this.fetchApi.fetch(url);
-    if (!response.ok) {
-      throw await ResponseError.fromResponse(response);
-    }
-
-    return (await response.json()) as CodemodParameterSchema;
   }
 
   async applyCodemod(

@@ -10,6 +10,21 @@ export type ConstraintsQueryV1alpha1 = Record<string, string | string[]>;
 
 export type ConstraintsQuery = ConstraintsQueryV1alpha1;
 
+export type CodemodParameter = {
+  [x: string]: any;
+
+  title: string;
+  type: string;
+};
+
+export type CodemodParameters = {
+  title: string;
+  required?: string[];
+  properties: {
+    [parameterName: string]: CodemodParameter;
+  };
+};
+
 /**
  * Backstage catalog Codemod kind Entity. Codemods are used by the Codemod
  * plugin to programatically update entities.
@@ -51,7 +66,7 @@ export interface CodemodEntityV1alpha1 extends Entity {
      * to collect user input and validate it against that schema. This can then be used in the `steps` part below to template
      * variables passed from the user into each action in the codemod.
      */
-    parameters?: JsonObject;
+    parameters?: CodemodParameters;
 
     /**
      * A list of steps to be executed in sequence which are defined by the codemod. These steps are a list of the underlying

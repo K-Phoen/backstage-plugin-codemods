@@ -70,7 +70,6 @@ describe('<RunPage />', () => {
   } as any;
 
   const codemodApiMock: jest.Mocked<CodemodApi> = {
-    getTemplateParameterSchema: jest.fn(),
     applyCodemod: jest.fn(),
     listRuns: jest.fn(),
     getRun: jest.fn(),

@@ -121,33 +121,6 @@ export async function createRouter(
   worker.start();
 
   // Endpoints
-  router.get(
-    '/v1/codemods/:namespace/:name/parameter-schema',
-    async (req, res) => {
-      const { namespace, name } = req.params;
-
-      const userIdentity = await identity.getIdentity({ request: req });
-      const token = userIdentity?.token;
-
-      const template = await findCodemod({
-        catalogApi: catalogClient,
-        entityRef: { kind: 'codemod', namespace, name },
-        token,
-      });
-
-      const parameters = template.spec.parameters ?? {};
-
-      res.json({
-        title:
-          parameters.description ??
-          template.metadata.title ??
-          template.metadata.name,
-        description: parameters.description ?? '',
-        ...parameters,
-      });
-    },
-  );
-
   router.get('/v1/actions', async (_req, res) => {
     const actionsList = actionRegistry
       .list()

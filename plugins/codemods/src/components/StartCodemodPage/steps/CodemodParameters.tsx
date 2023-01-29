@@ -1,14 +1,14 @@
 import React from 'react';
-import { transformSchemaToProps } from './schema';
 import { FormProps, IChangeEvent, withTheme } from '@rjsf/core';
 import { Theme as MuiTheme } from '@rjsf/material-ui';
+import { CodemodEntityV1alpha1 } from '@k-phoen/plugin-codemods-common';
+import { transformSchemaToProps } from './schema';
 import * as fieldOverrides from './FieldOverrides';
-import { CodemodParameterSchema } from '../../../types';
 
 const Form = withTheme(MuiTheme);
 
 type Props = {
-  schema: CodemodParameterSchema;
+  codemod: CodemodEntityV1alpha1;
   formData: Record<string, any>;
 
   widgets?: FormProps<any>['widgets'];
@@ -18,7 +18,7 @@ type Props = {
 };
 
 export const CodemodParameters = ({
-  schema,
+  codemod,
   formData,
   widgets,
   fields,
@@ -36,7 +36,7 @@ export const CodemodParameters = ({
       /*
       {...formProps}
       */
-      {...transformSchemaToProps(schema)}
+      {...transformSchemaToProps(codemod.spec.parameters || {})}
     >
       <></>
     </Form>
