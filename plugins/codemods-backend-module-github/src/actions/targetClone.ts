@@ -1,6 +1,43 @@
+import yaml from 'yaml';
 import { ScmIntegrationRegistry } from '@backstage/integration';
 import { createCodemodAction } from '@k-phoen/plugin-codemods-backend';
 import { cloneRepository, repoUrlFromEntity } from './helpers';
+
+const id = 'github:target:repo:clone';
+
+const examples = [
+  {
+    description: 'Clone the target entity',
+    example: yaml.stringify({
+      steps: [
+        {
+          action: id,
+          id: 'clone-target',
+          name: 'Clone the target entity in the `./repo` directory',
+          input: {
+            destination: './repo',
+          },
+        },
+      ],
+    }),
+  },
+  {
+    description: 'Shallow clone',
+    example: yaml.stringify({
+      steps: [
+        {
+          action: id,
+          id: 'shallow-clone',
+          name: 'Shallow-clone the target entity in the `./repo` directory',
+          input: {
+            destination: './repo',
+            depth: 1,
+          },
+        },
+      ],
+    }),
+  },
+];
 
 /**
  * Creates a new action that clones into the workspace the GitHub repository
@@ -15,9 +52,10 @@ export function createGithubTargetCloneAction(options: {
     destination: string;
     depth?: number;
   }>({
-    id: 'github:target:repo:clone',
+    id,
     description:
       'Clones the GitHub repository associated to the target entity.',
+    examples,
     schema: {
       input: {
         type: 'object',

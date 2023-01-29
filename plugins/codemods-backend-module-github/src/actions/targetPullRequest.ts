@@ -1,3 +1,4 @@
+import yaml from 'yaml';
 import { ScmIntegrationRegistry } from '@backstage/integration';
 import {
   createCodemodAction,
@@ -9,6 +10,50 @@ import {
   repoUrlFromEntity,
   setLabelsToissue,
 } from './helpers';
+
+const id = 'github:target:repo:pull-request';
+
+const examples = [
+  {
+    description: 'Open a pull request',
+    example: yaml.stringify({
+      steps: [
+        {
+          action: id,
+          id: 'open-pull-request',
+          name: 'Open a PR with the changes',
+          input: {
+            repositoryPath: './repo',
+            branchName: 'new-branch',
+            title: 'The second commit will shock you :o',
+            description: 'Just kidding. CLickbait in PRs is real.',
+            add: ['some/file.txt', 'some/directory/'],
+          },
+        },
+      ],
+    }),
+  },
+  {
+    description: 'Open a pull request with labels',
+    example: yaml.stringify({
+      steps: [
+        {
+          action: id,
+          id: 'open-pull-request-with-labels',
+          name: 'Open a PR with the changes',
+          input: {
+            repositoryPath: './repo',
+            branchName: 'new-branch',
+            title: 'The second commit will shock you :o',
+            description: 'Just kidding. CLickbait in PRs is real.',
+            add: ['some/file.txt', 'some/directory/'],
+            labels: ['dependencies', 'patch'],
+          },
+        },
+      ],
+    }),
+  },
+];
 
 /**
  * Creates a new action that opens a pull request with some new content.
@@ -26,8 +71,9 @@ export function createGithubTargetPullRequestAction(options: {
     description: string;
     labels?: string[];
   }>({
-    id: 'github:target:repo:pull-request',
+    id,
     description: 'Opens a pull request with some new content.',
+    examples,
     schema: {
       input: {
         type: 'object',
