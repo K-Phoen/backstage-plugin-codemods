@@ -23,7 +23,6 @@ jest.mock('react-router-dom', () => {
 });
 
 const codemodApiMock: jest.Mocked<CodemodApi> = {
-  getTemplateParameterSchema: jest.fn(),
   applyCodemod: jest.fn(),
   listRuns: jest.fn(),
   listJobs: jest.fn(),
@@ -52,12 +51,6 @@ const codemodEntity: CodemodEntity = {
   },
 };
 
-const parameterSchema = {
-  title: 'Golang dependencies update',
-  description: '',
-  steps: [],
-};
-
 const apis = TestApiRegistry.from(
   [codemodApiRef, codemodApiMock],
   [catalogApiRef, catalogApiMock],
@@ -67,9 +60,6 @@ const apis = TestApiRegistry.from(
 describe('StartCodemodPage', () => {
   it('renders correctly', async () => {
     catalogApiMock.getEntityByRef.mockResolvedValue(codemodEntity);
-    codemodApiMock.getTemplateParameterSchema.mockResolvedValue(
-      parameterSchema,
-    );
 
     const rendered = await renderInTestApp(
       <ApiProvider apis={apis}>
