@@ -8,6 +8,6 @@ import { CodemodAction } from './types';
 export const createCodemodAction = <TInput extends JsonObject>(
   codemodAction: CodemodAction<TInput>,
 ): CodemodAction<TInput> => {
-  // TODO(blam): Can add some more validation here to validate the action later on
+  // TODO: validate the action
   return codemodAction;
 };

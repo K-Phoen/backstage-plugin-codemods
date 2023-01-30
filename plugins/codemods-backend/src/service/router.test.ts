@@ -22,7 +22,7 @@ function createDatabase(): PluginDatabaseManager {
         },
       },
     }),
-  ).forPlugin('scaffolder');
+  ).forPlugin('codemods');
 }
 
 describe('createRouter', () => {

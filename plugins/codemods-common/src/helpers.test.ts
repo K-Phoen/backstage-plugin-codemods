@@ -1,9 +1,9 @@
-import { ConstraintsQuery } from '@k-phoen/plugin-codemods-common';
+import { CatalogFilters } from './CodemodEntityV1alpha1';
 import { constrainTargets } from './helpers';
 
 describe('constrainTargets', () => {
   it('leaves unconstrained targets untouched', async () => {
-    const targets: ConstraintsQuery = {
+    const targets: CatalogFilters = {
       kind: ['Component', 'API'],
       'spec.type': ['service', 'grpc'],
     };
@@ -13,12 +13,12 @@ describe('constrainTargets', () => {
   });
 
   it('constrains fields present both in targets and constraints lists', async () => {
-    const targets: ConstraintsQuery = {
+    const targets: CatalogFilters = {
       kind: ['Component', 'API'],
       'spec.type': ['service', 'grpc'],
       'spec.lifecycle': ['production'],
     };
-    const constraints: ConstraintsQuery = {
+    const constraints: CatalogFilters = {
       kind: ['Component'],
       'spec.type': ['service'],
     };
@@ -32,13 +32,13 @@ describe('constrainTargets', () => {
   });
 
   it('works with a more complex example', async () => {
-    const targets: ConstraintsQuery = {
+    const targets: CatalogFilters = {
       kind: ['Component', 'Resource'],
       'spec.type': ['service', 'library', 'database'],
       'spec.lifecycle': ['production'],
       'spec.owner': ['team-a', 'team-b'],
     };
-    const constraints: ConstraintsQuery = {
+    const constraints: CatalogFilters = {
       kind: ['Component', 'API'],
       'spec.type': ['service', 'library', 'grpc', 'openapi'],
       'spec.tier': ['tier-1', 'tier-2', 'tier-3'],

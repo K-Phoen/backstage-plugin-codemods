@@ -3,7 +3,7 @@ import PQueue from 'p-queue';
 import { assertError } from '@backstage/errors';
 import { WorkflowRunner, JobBroker, JobContext } from './types';
 import { NunjucksWorkflowRunner } from './NunjucksWorkflowRunner';
-import { CodemodActionRegistry } from '../actions';
+import { ActionRegistry } from '../actions';
 import {
   TemplateFilter,
   TemplateGlobal,
@@ -29,10 +29,11 @@ export type JobWorkerOptions = {
  */
 export type CreateWorkerOptions = {
   jobBroker: JobBroker;
-  actionRegistry: CodemodActionRegistry;
+  actionRegistry: ActionRegistry;
   workingDirectory: string;
   logger: Logger;
   additionalTemplateFilters?: Record<string, TemplateFilter>;
+  additionalTemplateGlobals?: Record<string, TemplateGlobal>;
   /**
    * The number of jobs that can be executed at the same time by the worker
    * @defaultValue 10
@@ -46,7 +47,6 @@ export type CreateWorkerOptions = {
    * ```
    */
   concurrentJobsLimit?: number;
-  additionalTemplateGlobals?: Record<string, TemplateGlobal>;
 };
 
 /**
@@ -112,9 +112,9 @@ export class JobWorker {
 
   async runOneJob(job: JobContext) {
     try {
-      if (job.spec.codemod.apiVersion !== 'codemod.backstage.io/v1alpha1') {
+      if (job.spec.apiVersion !== 'codemod.backstage.io/v1alpha1') {
         throw new Error(
-          `Unsupported Codemod apiVersion ${job.spec.codemod.apiVersion}`,
+          `Unsupported Codemod apiVersion ${job.spec.apiVersion}`,
         );
       }
 

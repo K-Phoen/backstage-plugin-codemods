@@ -6,8 +6,15 @@ import { CodemodAction } from './types';
  * Registry of all registered codemod actions.
  * @public
  */
-export class CodemodActionRegistry {
+export class ActionRegistry {
   private readonly actions = new Map<string, CodemodAction<any>>();
+
+  static create(actions: CodemodAction<any>[]): ActionRegistry {
+    const registry = new ActionRegistry();
+    actions.forEach(action => registry.register(action));
+
+    return registry;
+  }
 
   register<TInput extends JsonObject>(action: CodemodAction<TInput>) {
     if (this.actions.has(action.id)) {

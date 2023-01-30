@@ -2,7 +2,6 @@ export { DatabaseRunStore } from './DatabaseRunStore';
 export type { DatabaseRunStoreOptions } from './DatabaseRunStore';
 export { JobManager, StorageJobBroker } from './StorageJobBroker';
 export { JobWorker } from './JobWorker';
-export type { CurrentClaimedJob } from './StorageJobBroker';
 export type {
   JobCompletionState,
   RunStoreEmitOptions,

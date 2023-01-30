@@ -1,3 +1,5 @@
+import { CatalogFilters } from '@k-phoen/plugin-codemods-common';
+
 /** @public */
 export type EntityFilter = {
   /**
@@ -5,7 +7,7 @@ export type EntityFilter = {
    * value(s) to accept. For example:
    *   `{ 'kind': ['component'], 'metadata.name': ['component-1', 'component-2'] }`
    */
-  getCatalogFilters: () => Record<string, string | string[]>;
+  getCatalogFilters: () => CatalogFilters;
 
   /**
    * Serialize the filter value to a string for query params. The UI component responsible for

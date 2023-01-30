@@ -229,15 +229,15 @@ export class DatabaseRunStore implements RunStore {
       await tx<RawDbRunRow>('runs').insert({
         id: runId,
         spec: JSON.stringify(options.codemodSpec),
-        targets_count: options.jobsSpecs.length,
+        targets_count: options.targets.length,
         created_by: options.createdBy ?? null,
       });
 
-      for (const task of options.jobsSpecs) {
+      for (const target of options.targets) {
         await tx<RawDbJobRow>('jobs').insert({
           id: uuid(),
           run_id: runId,
-          target: task.targetRef,
+          target,
           status: 'open',
         });
       }

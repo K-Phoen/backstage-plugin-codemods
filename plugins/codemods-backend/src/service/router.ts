@@ -6,7 +6,6 @@ import { PluginDatabaseManager } from '@backstage/backend-common';
 import { PluginTaskScheduler } from '@backstage/backend-tasks';
 import { CatalogApi } from '@backstage/catalog-client';
 import {
-  Entity,
   parseEntityRef,
   stringifyEntityRef,
   UserEntity,
@@ -15,19 +14,18 @@ import { Config } from '@backstage/config';
 import { InputError } from '@backstage/errors';
 import { IdentityApi } from '@backstage/plugin-auth-node';
 import {
-  CodemodRunSpec,
-  ConstraintsQuery,
-  getEntityBaseUrl,
-  JobSpec,
+  CatalogFilters,
+  constrainTargets,
 } from '@k-phoen/plugin-codemods-common';
 import { DatabaseRunStore, StorageJobBroker } from '../codemod';
 import {
   CodemodAction,
-  CodemodActionRegistry,
+  ActionRegistry,
   createBuiltinActions,
 } from '../codemod/actions';
 import { JobWorker } from '../codemod/jobs/JobWorker';
-import { constrainTargets, findCodemod, getWorkingDirectory } from './helpers';
+import { codemodToRunSpec, findCodemod, getWorkingDirectory } from './helpers';
+import { TemplateFilter, TemplateGlobal } from '../lib';
 
 export interface RouterOptions {
   logger: Logger;
@@ -39,6 +37,9 @@ export interface RouterOptions {
 
   actions?: CodemodAction<any>[];
 
+  additionalTemplateFilters?: Record<string, TemplateFilter>;
+  additionalTemplateGlobals?: Record<string, TemplateGlobal>;
+
   /**
    * Sets the number of concurrent jobs that can be run at any given time on the JobWorker
    * @defaultValue 10
@@ -49,7 +50,7 @@ export interface RouterOptions {
 interface CreateRunRequest {
   codemodRef: string;
   values: any;
-  targets: ConstraintsQuery;
+  targets: CatalogFilters;
 }
 
 export async function createRouter(
@@ -64,6 +65,8 @@ export async function createRouter(
     identity,
     actions,
     concurrentJobsLimit,
+    additionalTemplateFilters,
+    additionalTemplateGlobals,
   } = options;
 
   const logger = parentLogger.child({ plugin: 'codemods' });
@@ -81,7 +84,9 @@ export async function createRouter(
   );
 
   const workingDirectory = await getWorkingDirectory(config, logger);
-  const actionRegistry = new CodemodActionRegistry();
+  const actionRegistry = ActionRegistry.create(
+    actions ?? createBuiltinActions(),
+  );
 
   if (scheduler && databaseRuntore.listStaleJobs) {
     await scheduler.scheduleTask({
@@ -106,16 +111,10 @@ export async function createRouter(
     actionRegistry,
     logger,
     workingDirectory,
-    additionalTemplateFilters: undefined,
-    additionalTemplateGlobals: undefined,
+    additionalTemplateFilters,
+    additionalTemplateGlobals,
     concurrentJobsLimit,
   });
-
-  const actionsToRegister = Array.isArray(actions)
-    ? actions
-    : createBuiltinActions();
-
-  actionsToRegister.forEach(action => actionRegistry.register(action));
 
   // Codemod workers start
   worker.start();
@@ -142,9 +141,6 @@ export async function createRouter(
     '/v1/runs',
     async (request: Request<{}, {}, CreateRunRequest, {}>, response) => {
       const { codemodRef, targets } = request.body;
-      const { kind, namespace, name } = parseEntityRef(codemodRef, {
-        defaultKind: 'codemod',
-      });
 
       const callerIdentity = await identity.getIdentity({ request });
       const token = callerIdentity?.token;
@@ -162,7 +158,9 @@ export async function createRouter(
 
       const codemod = await findCodemod({
         catalogApi: catalogClient,
-        entityRef: { kind, namespace, name },
+        entityRef: parseEntityRef(codemodRef, {
+          defaultKind: 'codemod',
+        }),
         token,
       });
 
@@ -175,55 +173,24 @@ export async function createRouter(
         }
       }
 
-      const mergedTargets = constrainTargets(
-        targets,
-        codemod.spec.constraints || {},
-      );
-
-      const codemodSpec: CodemodRunSpec = {
-        apiVersion: codemod.apiVersion,
-        user: {
-          entity: userEntity as UserEntity,
-          ref: userEntityRef,
-        },
-        targets: mergedTargets,
+      const codemodSpec = codemodToRunSpec({
+        codemod,
+        targets: constrainTargets(targets, codemod.spec.constraints || {}),
         parameters: values,
-        steps: codemod.spec.steps.map((step, index) => ({
-          ...step,
-          id: step.id ?? `step-${index + 1}`,
-          name: step.name ?? step.action,
-        })),
-        output: codemod.spec.output ?? {},
-        codemodInfo: {
-          entityRef: stringifyEntityRef({
-            kind,
-            namespace,
-            name: codemod.metadata?.name,
-          }),
-          baseUrl: getEntityBaseUrl(codemod),
-          entity: {
-            metadata: codemod.metadata,
-          },
-        },
-      };
+        user: userEntity as UserEntity,
+      });
 
       const targetEntities = await catalogClient.getEntities(
         {
-          filter: mergedTargets,
+          filter: codemodSpec.targets,
           fields: ['kind', 'metadata.name', 'metadata.namespace'],
         },
         { token },
       );
-      const jobsSpecs = targetEntities.items.map(
-        (entity: Entity): JobSpec => ({
-          codemod: codemodSpec,
-          targetRef: stringifyEntityRef(entity),
-        }),
-      );
 
       const result = await jobBroker.dispatch({
         codemodSpec: codemodSpec,
-        jobsSpecs: jobsSpecs,
+        targets: targetEntities.items.map(entity => stringifyEntityRef(entity)),
         createdBy: userEntityRef,
       });
 

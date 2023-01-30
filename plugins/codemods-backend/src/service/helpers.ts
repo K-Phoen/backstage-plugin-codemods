@@ -1,19 +1,22 @@
-import fs from 'fs-extra';
+import fs from 'fs';
 import os from 'os';
 import { Logger } from 'winston';
 import { CatalogApi } from '@backstage/catalog-client';
 import {
   CompoundEntityRef,
   stringifyEntityRef,
+  UserEntity,
 } from '@backstage/catalog-model';
 import { Config } from '@backstage/config';
 import { assertError, InputError, NotFoundError } from '@backstage/errors';
 import {
+  CatalogFilters,
+  CodemodEntity,
   CodemodEntityV1alpha1,
-  ConstraintsQuery,
-  intersect,
-  toList,
+  CodemodRunSpec,
+  getEntityBaseUrl,
 } from '@k-phoen/plugin-codemods-common';
+import { JsonObject } from '@backstage/types';
 
 export const getWorkingDirectory = async (
   config: Config,
@@ -26,7 +29,10 @@ export const getWorkingDirectory = async (
   const workingDirectory = config.getString('backend.workingDirectory');
   try {
     // Check if working directory exists and is writable
-    await fs.access(workingDirectory, fs.constants.F_OK | fs.constants.W_OK);
+    await fs.accessSync(
+      workingDirectory,
+      fs.constants.F_OK | fs.constants.W_OK,
+    );
     logger.info(`using working directory: ${workingDirectory}`);
   } catch (err) {
     assertError(err);
@@ -65,21 +71,37 @@ export const findCodemod = async (options: {
   return codemod as CodemodEntityV1alpha1;
 };
 
-export const constrainTargets = (
-  targets: ConstraintsQuery,
-  constraints: ConstraintsQuery,
-): ConstraintsQuery => {
-  const merged: ConstraintsQuery = { ...constraints };
-
-  for (const [key, value] of Object.entries(targets)) {
-    // no constraint on `key`
-    if (!constraints[key]) {
-      merged[key] = value;
-      continue;
-    }
-
-    merged[key] = intersect(toList(targets[key]), toList(constraints[key]));
-  }
-
-  return merged;
+export const codemodToRunSpec = ({
+  codemod,
+  user,
+  targets,
+  parameters,
+}: {
+  codemod: CodemodEntity;
+  user?: UserEntity;
+  targets: CatalogFilters;
+  parameters: JsonObject;
+}): CodemodRunSpec => {
+  return {
+    apiVersion: codemod.apiVersion,
+    user: {
+      entity: user,
+      ref: user ? stringifyEntityRef(user) : undefined,
+    },
+    targets: targets,
+    parameters: parameters,
+    steps: codemod.spec.steps.map((step, index) => ({
+      ...step,
+      id: step.id ?? `step-${index + 1}`,
+      name: step.name ?? step.action,
+    })),
+    output: codemod.spec.output ?? {},
+    codemodInfo: {
+      entityRef: stringifyEntityRef(codemod),
+      baseUrl: getEntityBaseUrl(codemod),
+      entity: {
+        metadata: codemod.metadata,
+      },
+    },
+  };
 };

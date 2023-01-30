@@ -14,15 +14,11 @@ import useAsyncFn from 'react-use/lib/useAsyncFn';
 import useDebounce from 'react-use/lib/useDebounce';
 import useMountedState from 'react-use/lib/useMountedState';
 import { EntityKindFilter, FacetFilter } from '../filters';
-import { reduceCatalogFilters } from '../utils';
 import { useApi } from '@backstage/core-plugin-api';
 import { EntityFilterQuery } from '@backstage/catalog-client';
 import { catalogApiRef } from '@backstage/plugin-catalog-react';
 import { EntityFilter } from '../types';
-import {
-  CodemodEntity,
-  ConstraintsQuery,
-} from '@k-phoen/plugin-codemods-common';
+import { CodemodEntity, CatalogFilters } from '@k-phoen/plugin-codemods-common';
 
 /** @public */
 export interface DefaultEntityFilters {
@@ -64,7 +60,7 @@ export type EntityListContextProps<
   /**
    * Set of filters defined by the codemod, constraining the possible targets.
    */
-  targetConstraints: ConstraintsQuery;
+  targetConstraints: CatalogFilters;
 
   /**
    * Update one or more of the registered filters. Optional filters can be set to `undefined` to
@@ -83,6 +79,15 @@ export type EntityListContextProps<
 
   loading: boolean;
   error?: Error;
+};
+
+const reduceCatalogFilters = (filters: EntityFilter[]): CatalogFilters => {
+  return filters.reduce((compoundFilter, filter) => {
+    return {
+      ...compoundFilter,
+      ...filter.getCatalogFilters(),
+    };
+  }, {} as CatalogFilters);
 };
 
 /**

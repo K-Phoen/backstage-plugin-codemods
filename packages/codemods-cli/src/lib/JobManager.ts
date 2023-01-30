@@ -1,40 +1,42 @@
 import { Logger } from 'winston';
 import { Entity } from '@backstage/catalog-model';
+import { JsonObject } from '@backstage/types';
 import {
-  CurrentClaimedJob,
   JobCompletionState,
   JobContext,
 } from '@k-phoen/plugin-codemods-backend';
-import { JsonObject } from '@backstage/types';
+import { CodemodRunSpec } from '@k-phoen/plugin-codemods-common';
 
 export class JobManager implements JobContext {
   private isDone = false;
 
   private heartbeatTimeoutId?: ReturnType<typeof setInterval>;
 
-  static create(job: CurrentClaimedJob, target: Entity, logger: Logger) {
-    const agent = new JobManager(job, target, logger);
+  static create(
+    jobId: string,
+    codemod: CodemodRunSpec,
+    target: Entity,
+    logger: Logger,
+  ) {
+    const agent = new JobManager(jobId, codemod, target, logger);
     agent.startTimeout();
     return agent;
   }
 
   // Runs heartbeat internally
   private constructor(
-    private readonly job: CurrentClaimedJob,
+    private readonly jobId: string,
+    private readonly codemod: CodemodRunSpec,
     readonly target: Entity,
     private readonly logger: Logger,
   ) {}
 
   get spec() {
-    return this.job.spec;
-  }
-
-  get createdBy() {
-    return this.job.createdBy;
+    return this.codemod;
   }
 
   async getWorkspaceName() {
-    return this.job.jobId;
+    return this.jobId;
   }
 
   get done() {
@@ -64,7 +66,7 @@ export class JobManager implements JobContext {
         this.startTimeout();
       } catch (error) {
         this.isDone = true;
-        this.logger.error(`Heartbeat for job ${this.job.jobId} failed`, error);
+        this.logger.error(`Heartbeat for job ${this.jobId} failed`, error);
       }
     }, 1000);
   }
