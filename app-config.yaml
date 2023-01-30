@@ -64,6 +64,9 @@ catalog:
       rules:
         - allow: [Codemod]
 
+    - type: file
+      target: ../../go-backstage.yaml
+
     # Some backstage example entities
     - type: url
       target: https://github.com/backstage/backstage/blob/master/packages/catalog-model/examples/all.yaml
