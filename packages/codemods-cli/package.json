@@ -1,7 +1,7 @@
 {
   "name": "@k-phoen/codemods-cli",
   "description": "Utility CLI for running Backstage codemods locally.",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "publishConfig": {
     "access": "public"
   },
@@ -59,8 +59,8 @@
     "@backstage/cli-common": "^0.1.11",
     "@backstage/config": "^1.0.6",
     "@backstage/types": "^1.0.2",
-    "@k-phoen/plugin-codemods-backend": "0.0.0",
-    "@k-phoen/plugin-codemods-common": "0.0.0",
+    "@k-phoen/plugin-codemods-backend": "0.0.1",
+    "@k-phoen/plugin-codemods-common": "0.0.1",
     "commander": "^9.1.0",
     "dockerode": "^3.3.1",
     "fs-extra": "^10.0.1",
