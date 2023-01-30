@@ -1,10 +1,8 @@
 {
   "name": "@k-phoen/codemods-cli",
   "description": "Utility CLI for running Backstage codemods locally.",
-  "version": "0.0.1",
-  "publishConfig": {
-    "access": "public"
-  },
+  "version": "0.0.0",
+  "private": true,
   "backstage": {
     "role": "cli"
   },
