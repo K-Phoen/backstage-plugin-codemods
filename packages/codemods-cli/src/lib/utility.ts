@@ -1,4 +1,7 @@
+import path from 'path';
 import * as winston from 'winston';
+import { ConfigReader } from '@backstage/config';
+import { loadConfig } from '@backstage/config-loader';
 
 const customFormat = winston.format.printf(
   ({ level, message, component, timestamp }) => {
@@ -25,4 +28,18 @@ export const createLogger = ({
   });
 
   return logger;
+};
+
+export const loadConfigFile = async ({
+  configFile,
+}: {
+  configFile: string;
+}): Promise<ConfigReader> => {
+  const configPath = path.resolve(configFile);
+  const { appConfigs } = await loadConfig({
+    configRoot: path.dirname(configPath),
+    configTargets: [{ path: configPath }],
+  });
+
+  return ConfigReader.fromConfigs(appConfigs);
 };
