@@ -5,6 +5,7 @@ import {
   Entity,
   stringifyEntityRef,
 } from '@backstage/catalog-model';
+import { ScmIntegrations } from '@backstage/integration';
 import { JsonObject } from '@backstage/types';
 import {
   ActionRegistry,
@@ -12,14 +13,21 @@ import {
   JobBroker,
   JobWorker,
 } from '@k-phoen/plugin-codemods-backend';
+import { createBuiltinGithubActions } from '@k-phoen/codemods-backend-module-github';
 import {
   getEntityBaseUrl,
   CodemodEntityV1alpha1,
   CodemodRunSpec,
 } from '@k-phoen/plugin-codemods-common';
-import { createLogger, JobManager, parseYamlFile } from '../../lib';
+import {
+  createLogger,
+  JobManager,
+  loadConfigFile,
+  parseYamlFile,
+} from '../../lib';
 
 type RunOptions = {
+  appConfig: string;
   codemodManifest: string;
   entityManifest: string;
   parameters: JsonObject;
@@ -43,8 +51,14 @@ export default async function run(opts: RunOptions) {
     )} will be applied to ${stringifyEntityRef(entity)}`,
   );
 
+  const config = await loadConfigFile({ configFile: opts.appConfig });
+  const integrations = ScmIntegrations.fromConfig(config);
+
   // actions setup
-  const actionRegistry = ActionRegistry.create(createBuiltinActions());
+  const actionRegistry = ActionRegistry.create([
+    ...createBuiltinActions(),
+    ...createBuiltinGithubActions({ integrations }),
+  ]);
 
   // dependencies setup
   const workingDirectory = tmpdir();

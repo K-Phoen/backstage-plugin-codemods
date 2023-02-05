@@ -3200,7 +3200,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@k-phoen/codemods-backend-module-github@0.0.1, @k-phoen/codemods-backend-module-github@workspace:plugins/codemods-backend-module-github":
+"@k-phoen/codemods-backend-module-github@0.0.1, @k-phoen/codemods-backend-module-github@workspace:^, @k-phoen/codemods-backend-module-github@workspace:plugins/codemods-backend-module-github":
   version: 0.0.0-use.local
   resolution: "@k-phoen/codemods-backend-module-github@workspace:plugins/codemods-backend-module-github"
   dependencies:
@@ -3231,7 +3231,10 @@ __metadata:
     "@backstage/cli": ^0.22.1
     "@backstage/cli-common": ^0.1.11
     "@backstage/config": ^1.0.6
+    "@backstage/config-loader": ^1.1.8
+    "@backstage/integration": ^1.4.2
     "@backstage/types": ^1.0.2
+    "@k-phoen/codemods-backend-module-github": "workspace:^"
     "@k-phoen/plugin-codemods-backend": 0.0.1
     "@k-phoen/plugin-codemods-common": 0.0.1
     "@types/commander": ^2.12.2

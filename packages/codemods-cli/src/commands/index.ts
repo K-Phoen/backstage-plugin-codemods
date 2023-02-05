@@ -12,6 +12,7 @@ export function registerCommands(program: Command) {
       '--entity-manifest <FILE>',
       'Path to a manifest describing catalog entity to apply the codemod on.',
     )
+    .requiredOption('--app-config <FILE>', 'Path to app-config file.')
     .requiredOption(
       '--parameters <JSON>',
       'JSON blob describing the parameters to hand over to the codemod.',
