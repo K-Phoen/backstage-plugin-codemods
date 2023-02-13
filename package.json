@@ -38,7 +38,7 @@
   },
   "devDependencies": {
     "@backstage/cli": "^0.22.1",
-    "@microsoft/api-extractor": "^7.33.8",
+    "@microsoft/api-extractor": "^7.34.4",
     "@spotify/prettier-config": "^12.0.0",
     "concurrently": "^6.0.0",
     "lint-staged": "^13.0.3",
