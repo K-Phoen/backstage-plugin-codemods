@@ -3330,7 +3330,7 @@ __metadata:
     "@material-ui/icons": ^4.9.1
     "@material-ui/lab": 4.0.0-alpha.57
     "@rjsf/core": ^3.2.1
-    "@rjsf/material-ui": ^3.2.1
+    "@rjsf/material-ui": ^5.2.1
     "@testing-library/jest-dom": ^5.10.1
     "@testing-library/react": ^12.1.3
     "@testing-library/react-hooks": ^8.0.0
@@ -4163,15 +4163,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rjsf/material-ui@npm:^3.2.1":
-  version: 3.2.1
-  resolution: "@rjsf/material-ui@npm:3.2.1"
+"@rjsf/material-ui@npm:^5.2.1":
+  version: 5.2.1
+  resolution: "@rjsf/material-ui@npm:5.2.1"
   peerDependencies:
-    "@material-ui/core": ^4.2.0
-    "@material-ui/icons": ^4.2.1
-    "@rjsf/core": ^3.0.0
-    react: ">=16"
-  checksum: bd25cd9f2e2d568c653755e7268fe3e53279e1ae675e39bccd85f65557623d2052b706763e017a949f897751e25a16d0f2c8b995508bb56907be6786b09e2b1e
+    "@material-ui/core": ^4.12.3
+    "@material-ui/icons": ^4.11.2
+    "@rjsf/core": ^5.0.0
+    "@rjsf/utils": ^5.0.0
+    react: ^16.14.0 || >=17
+  checksum: de469b60670049d1be78d95a288d5dba07dd4eb28a8f8defb6f8c45e61dc90af81d980fc3b0290325ce7965c57ace32d75882882d23936b2d784f7065d9ee088
   languageName: node
   linkType: hard
 
