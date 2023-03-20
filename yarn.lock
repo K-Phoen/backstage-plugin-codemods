@@ -3345,7 +3345,7 @@ __metadata:
     json-schema: ^0.4.0
     lodash: ^4.17.21
     luxon: ^3.0.0
-    msw: ^0.49.0
+    msw: ^1.1.1
     qs: ^6.9.4
     react-use: ^17.2.4
     use-immer: ^0.7.0
@@ -15253,9 +15253,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"msw@npm:^0.49.0":
-  version: 0.49.3
-  resolution: "msw@npm:0.49.3"
+"msw@npm:^1.1.1":
+  version: 1.1.1
+  resolution: "msw@npm:1.1.1"
   dependencies:
     "@mswjs/cookies": ^0.2.2
     "@mswjs/interceptors": ^0.17.5
@@ -15277,13 +15277,13 @@ __metadata:
     type-fest: ^2.19.0
     yargs: ^17.3.1
   peerDependencies:
-    typescript: ">= 4.4.x <= 4.9.x"
+    typescript: ">= 4.4.x <= 5.0.x"
   peerDependenciesMeta:
     typescript:
       optional: true
   bin:
     msw: cli/index.js
-  checksum: 8322cd42cd69f289c05517d02bde22fc2f10e86fc2d0d209d9df54bd03d10b8123723c5587a2654dcd2cd0f314a016f9eccac88cffa30fafd1f9fead16db639e
+  checksum: d99c13911a2f3bc3b07a38ed60e0ec19883bc89e3f77a2d7609ce580eb4f50883e2b15ef140927fc0424e661ef1c455eea8fcd614202f2eaef66f53b794356f7
   languageName: node
   linkType: hard
 
