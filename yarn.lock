@@ -3213,7 +3213,7 @@ __metadata:
     "@k-phoen/plugin-codemods-backend": 0.0.1
     "@octokit/rest": ^19.0.5
     "@types/mock-fs": ^4.13.0
-    "@types/node": ^16.11.26
+    "@types/node": ^18.15.3
     isomorphic-git: ^1.21.0
     jest-when: ^3.1.0
     mock-fs: ^5.1.0
@@ -3240,7 +3240,7 @@ __metadata:
     "@types/commander": ^2.12.2
     "@types/fs-extra": ^9.0.6
     "@types/http-proxy": ^1.17.4
-    "@types/node": ^16.11.26
+    "@types/node": ^18.15.3
     "@types/serve-handler": ^6.1.0
     "@types/webpack-env": ^1.15.3
     commander: ^9.1.0
@@ -5327,10 +5327,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^16.11.26, @types/node@npm:^16.9.2":
+"@types/node@npm:^16.9.2":
   version: 16.18.11
   resolution: "@types/node@npm:16.18.11"
   checksum: 2a3b1da13063debe6e26f732defb5f03ef4ef732c3e08daba838d8850433bd00e537ce1a97ce9bcfc4b15db5218d701d1265fae94e0d6926906bec157e6b46e0
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^18.15.3":
+  version: 18.15.3
+  resolution: "@types/node@npm:18.15.3"
+  checksum: 31b1d92475a82c30de29aa6c0771b18a276552d191283b4423ba2d61b3f01159bf0d02576c0b7cc834b043997893800db6bb47f246083ed85aa45e79c80875d7
   languageName: node
   linkType: hard
 
