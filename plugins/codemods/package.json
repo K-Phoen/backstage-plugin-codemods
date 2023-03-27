@@ -54,7 +54,7 @@
     "@types/json-schema": "^7.0.9",
     "classnames": "^2.2.6",
     "humanize-duration": "^3.25.1",
-    "immer": "^9.0.1",
+    "immer": "^9.0.21",
     "json-schema": "^0.4.0",
     "lodash": "^4.17.21",
     "luxon": "^3.0.0",
