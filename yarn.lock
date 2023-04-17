@@ -3341,7 +3341,7 @@ __metadata:
     cross-fetch: ^3.1.5
     event-source-polyfill: 1.0.25
     humanize-duration: ^3.25.1
-    immer: ^9.0.1
+    immer: ^10.0.0
     json-schema: ^0.4.0
     lodash: ^4.17.21
     luxon: ^3.0.0
@@ -11820,6 +11820,13 @@ __metadata:
   version: 5.2.4
   resolution: "ignore@npm:5.2.4"
   checksum: 3d4c309c6006e2621659311783eaea7ebcd41fe4ca1d78c91c473157ad6666a57a2df790fe0d07a12300d9aac2888204d7be8d59f9aaf665b1c7fcdb432517ef
+  languageName: node
+  linkType: hard
+
+"immer@npm:^10.0.0":
+  version: 10.0.0
+  resolution: "immer@npm:10.0.0"
+  checksum: 221279bdb8cd14dcecff4202b7d25c1cb635f6d856245a7314185af0d15a8b49516af1e6ad5c3858e08c8b3fad97d531acab77e92b9681d4eddb26313c118dfa
   languageName: node
   linkType: hard
 
